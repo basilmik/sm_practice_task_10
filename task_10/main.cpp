@@ -1,4 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS
+#include "../libwinbgi/src/graphics.h"
 #include "stdio.h"
 
 
@@ -26,6 +27,16 @@ public:
 	{
 		printf("(%d; %d) ^ %d\n", x, y, count);
 	}
+
+	void draw(int _c)
+	{
+		setcolor(_c);
+		setfillstyle(SOLID_FILL, _c);
+
+		circle(x, y, 3);
+		floodfill( x,  y, _c);
+	}
+
 	// End class
 };
 
@@ -52,11 +63,6 @@ public:
 		}
 		max_count_idx = 0;
 		max_count = 0;
-	}
-
-	point* get_idx(int idx) // override []
-	{
-		return &arr[idx];
 	}
 
 	point* operator[](int idx)
@@ -108,6 +114,18 @@ public:
 			}
 		}
 		//End func
+	}
+
+	void draw(int _c)
+	{
+
+		for (int i = 0; i < size; i++)
+		{
+
+			arr[i].draw(_c);
+
+			getch();
+		}
 	}
 
 
@@ -187,6 +205,22 @@ int main()
 
 	printf("x:%d y:%d idx:%d, times met:%d\n", target_x, target_y, target_idx, max_count);
 	// output result
+
+	initwindow(1000, 1000);
+
+	clearviewport();
+
+	for (int i = 0; i < num_of_mnozh; i++)
+	{
+		set[i].draw(i + 5);
+		printf("set new\n");
+	}
+
+	set[0].arr[target_idx].draw(4);
+
+	getch();
+
+	closegraph();
 
 
 	return 0;
