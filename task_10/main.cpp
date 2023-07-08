@@ -48,6 +48,7 @@ public:
 	point* arr;
 	int max_count_idx;
 	int max_count;
+	int marked;
 
 	mnozh()
 	{
@@ -63,6 +64,7 @@ public:
 		}
 		max_count_idx = 0;
 		max_count = 0;
+		marked = 0;
 	}
 
 	point* operator[](int idx)
@@ -82,20 +84,13 @@ public:
 
 	void compare(mnozh* ptr) //&?
 	{
-		for (int i = 0; i < size; i++)
-		
-		
+		for (int i = 0; i < size; i++)			
 		{
 			for (int j = 0; j < size; j++)
 			{
-				printf("i = %d j = %d\n", i, j);
-				//printf("ix %d iy %d  jx %d jy %d\n", arr[i].x ,  arr[i].y , (*ptr)[j]->x, (*ptr)[j]->y);
-				
 				if (arr[i].x == (*ptr)[j]->x && arr[i].y == (*ptr)[j]->y)
 				{
 					(*ptr)[j]->count++;
-					arr[i].count++;
-					arr[j].print();
 				}
 				
 			}
@@ -121,13 +116,27 @@ public:
 
 		for (int i = 0; i < size; i++)
 		{
-
 			arr[i].draw(_c);
-
-			getch();
 		}
 	}
 
+	void mark()
+	{
+		marked = 1;
+	}
+
+	int has(int x, int y)
+	{
+		for (int i = 0; i < size; i++)
+		{
+			if (arr[i].x == x && arr[i].y == y)
+			{
+				return 1;
+			}
+		}
+
+		return 0;
+	}
 
 	// End class
 };
@@ -148,7 +157,7 @@ int main()
 
 	fscanf(fin, "%d", &num_of_mnozh);
 	fscanf(fin, "%d", &num_of_el);
-	printf("scanned: nom: %d noe: %d\n", num_of_mnozh, num_of_el);
+	//printf("scanned: nom: %d noe: %d\n", num_of_mnozh, num_of_el);
 
 	mnozh* set = new mnozh[num_of_mnozh]; // ?
 	for (int i = 0; i < num_of_mnozh; i++)
@@ -171,15 +180,6 @@ int main()
 
 	fclose(fin);
 
-	for (int i = 0; i < num_of_mnozh; i++)
-	{
-		for (int j = 0; j < num_of_el; j++)
-		{
-			mnozh tmp = set[i];
-			tmp[j]->print();
-
-		}
-	}
 
 
 
@@ -187,39 +187,54 @@ int main()
 	for (int i = 1; i < num_of_mnozh; i++)
 	{
 		set[i].compare(&set[0]);
-		printf("set i %d\n", i); set[i].print();
-		printf("set 0:\n");
-		set[0].print();
-
+		//set[0].print();
 	}
 
 
 	// Find max count of points covered
 
 	set[0].find_max_count_idx();
+
 	int target_idx = set[0].max_count_idx;
 	int max_count = set[0].max_count;
 	int target_x = set[0][target_idx]->x;
 	int target_y = set[0][target_idx]->y;
 
+	// mark that have this point
+	for (int i = 0; i < num_of_mnozh; i++)
+	{
+		if (set[i].has(target_x, target_y))
+			set[i].mark();
+	}
 
-	printf("x:%d y:%d idx:%d, times met:%d\n", target_x, target_y, target_idx, max_count);
+
+	//printf("x:%d y:%d idx:%d, times met:%d\n", target_x, target_y, target_idx, max_count);
 	// output result
 
-	initwindow(1000, 1000);
-
+	initwindow(900, 900);
 	clearviewport();
 
 	for (int i = 0; i < num_of_mnozh; i++)
 	{
-		set[i].draw(i + 5);
-		printf("set new\n");
+		int color = i + 5;	
+		if (set[i].marked)
+			set[i].draw(color % 15);
+		else
+			set[i].draw(15);
+		getch();
 	}
 
+
+
+	char message[128] = {0};
+	setcolor(15);
+	sprintf_s(message, "(%d; %d) : %d", target_x, target_y, max_count+1);
+	settextstyle(0, 0, 1);
+	outtextxy(700, 860, message);
 	set[0].arr[target_idx].draw(4);
 
-	getch();
 
+	getch();
 	closegraph();
 
 
